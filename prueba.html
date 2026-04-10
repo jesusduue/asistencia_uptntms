@@ -1,0 +1,3227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Control de Asistencia - UPTN-TMS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        :root {
+            --primary: #175e7a;
+            --primary-dark: #124a5f;
+            --primary-light: #2a7a9a;
+            --accent: #2196F3;
+            --accent-hover: #1976D2;
+            --bg-light: #E3F2FD;
+            --gold: #E2A42B;
+            --success: #2E7D32;
+            --danger: #C62828;
+            --warning: #FF6F00;
+            --cream: #F5F7FA;
+            --white: #FFFFFF;
+            --text-primary: #1A1A2E;
+            --text-secondary: #5A6275;
+            --border: #E0E4EA;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--cream);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Login Page */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 50%, #0d3a4d 100%);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(226,164,43,0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .login-container::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(33,150,243,0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .login-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 420px;
+            padding: 48px 40px;
+            position: relative;
+            z-index: 1;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .login-logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .login-logo-icon {
+            width: 72px;
+            height: 72px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            box-shadow: 0 8px 24px rgba(23,94,122,0.3);
+        }
+
+        .login-logo-icon svg {
+            width: 36px;
+            height: 36px;
+            color: var(--white);
+        }
+
+        .login-logo h1 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            line-height: 1.3;
+        }
+
+        .login-logo p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper svg {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 14px 12px 44px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            font-family: inherit;
+            transition: var(--transition);
+            background: var(--white);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(33,150,243,0.1);
+        }
+
+        .form-input.error {
+            border-color: var(--danger);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .btn:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: var(--white);
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(23,94,122,0.35);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        /* Main App Layout */
+        .app-container {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .app-container.active {
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: var(--white);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-logo {
+            width: 44px;
+            height: 44px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-logo svg {
+            width: 24px;
+            height: 24px;
+            color: var(--white);
+        }
+
+        .sidebar-brand-text h2 {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--white);
+            line-height: 1.2;
+        }
+
+        .sidebar-brand-text span {
+            font-size: 11px;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 16px 12px;
+            overflow-y: auto;
+        }
+
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            padding: 12px 12px 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: var(--transition);
+            cursor: pointer;
+            margin-bottom: 4px;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: var(--white);
+            box-shadow: 0 4px 12px rgba(23,94,122,0.25);
+        }
+
+        .nav-item svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--gold) 0%, #d4922a 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--white);
+            font-size: 14px;
+        }
+
+        .user-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-role {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .logout-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: transparent;
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .logout-btn:hover {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            min-height: 100vh;
+        }
+
+        .top-bar {
+            background: var(--white);
+            padding: 16px 28px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .menu-toggle {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: var(--cream);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+        }
+
+        .page-title h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .page-title p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .top-bar-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .current-date {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-light);
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--primary);
+        }
+
+        .content-area {
+            padding: 28px;
+        }
+
+        /* Page Sections */
+        .page-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            transition: var(--transition);
+            animation: slideUp 0.4s ease backwards;
+        }
+
+        .stat-card:nth-child(1) { animation-delay: 0.05s; }
+        .stat-card:nth-child(2) { animation-delay: 0.1s; }
+        .stat-card:nth-child(3) { animation-delay: 0.15s; }
+        .stat-card:nth-child(4) { animation-delay: 0.2s; }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .stat-icon.primary { background: rgba(23,94,122,0.1); color: var(--primary); }
+        .stat-icon.success { background: rgba(46,125,50,0.1); color: var(--success); }
+        .stat-icon.warning { background: rgba(255,111,0,0.1); color: var(--warning); }
+        .stat-icon.danger { background: rgba(198,40,40,0.1); color: var(--danger); }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Cards & Tables */
+        .card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title svg {
+            width: 20px;
+            height: 20px;
+            color: var(--primary);
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th {
+            background: var(--cream);
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            white-space: nowrap;
+        }
+
+        th:first-child {
+            border-radius: 8px 0 0 8px;
+        }
+
+        th:last-child {
+            border-radius: 0 8px 8px 0;
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr {
+            transition: var(--transition);
+        }
+
+        tbody tr:hover {
+            background: var(--bg-light);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success { background: rgba(46,125,50,0.1); color: var(--success); }
+        .badge-danger { background: rgba(198,40,40,0.1); color: var(--danger); }
+        .badge-warning { background: rgba(255,111,0,0.1); color: var(--warning); }
+        .badge-primary { background: rgba(23,94,122,0.1); color: var(--primary); }
+        .badge-gold { background: rgba(226,164,43,0.15); color: #b8860b; }
+
+        /* Buttons */
+        .btn-sm {
+            padding: 8px 14px;
+            font-size: 13px;
+        }
+
+        .btn-accent {
+            background: var(--accent);
+            color: var(--white);
+        }
+
+        .btn-accent:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: var(--white);
+        }
+
+        .btn-success:hover {
+            background: #1b5e20;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        .btn-danger:hover {
+            background: #b71c1c;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--bg-light);
+        }
+
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            border-radius: var(--radius-sm);
+        }
+
+        .btn-icon svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Form Elements */
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        select.form-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235A6275' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 40px;
+        }
+
+        .search-box {
+            position: relative;
+            max-width: 320px;
+        }
+
+        .search-box input {
+            padding-left: 44px;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(26,26,46,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 520px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            animation: scaleIn 0.25s ease;
+        }
+
+        .modal-header {
+            padding: 24px 28px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: var(--cream);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        .modal-body {
+            padding: 28px;
+        }
+
+        .modal-footer {
+            padding: 20px 28px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* Toast Container */
+        .toast-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .toast {
+            background: var(--white);
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 300px;
+            max-width: 420px;
+            animation: slideUp 0.3s ease;
+            border-left: 4px solid var(--success);
+        }
+
+        .toast.error { border-left-color: var(--danger); }
+        .toast.warning { border-left-color: var(--warning); }
+        .toast.info { border-left-color: var(--accent); }
+
+        .toast-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .toast.success .toast-icon { color: var(--success); }
+        .toast.error .toast-icon { color: var(--danger); }
+        .toast.warning .toast-icon { color: var(--warning); }
+        .toast.info .toast-icon { color: var(--accent); }
+
+        .toast-message {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Attendance Section */
+        .attendance-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            background: var(--cream);
+            padding: 6px;
+            border-radius: var(--radius-md);
+            width: fit-content;
+        }
+
+        .tab-btn {
+            padding: 10px 24px;
+            border: none;
+            background: transparent;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: var(--transition);
+        }
+
+        .tab-btn.active {
+            background: var(--white);
+            color: var(--primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .employee-search-result {
+            background: var(--bg-light);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .employee-search-result.visible {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+
+        .employee-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+        }
+
+        .info-item label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .info-item value {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .attendance-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .attendance-actions .btn {
+            flex: 1;
+            min-width: 160px;
+        }
+
+        /* Reports */
+        .report-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .report-stat {
+            background: var(--white);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .report-stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .report-stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Loading Skeleton */
+        .skeleton {
+            background: linear-gradient(90deg, var(--cream) 25%, #e8ecf1 50%, var(--cream) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: var(--radius-sm);
+        }
+
+        .skeleton-text {
+            height: 16px;
+            margin-bottom: 10px;
+        }
+
+        .skeleton-text.short { width: 60%; }
+        .skeleton-text.medium { width: 80%; }
+
+        /* Mobile Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+                box-shadow: var(--shadow-lg);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .menu-toggle {
+                display: flex;
+            }
+
+            .mobile-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 99;
+                display: none;
+            }
+
+            .mobile-overlay.active {
+                display: block;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .content-area {
+                padding: 16px;
+            }
+
+            .top-bar {
+                padding: 12px 16px;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-value {
+                font-size: 26px;
+            }
+
+            .card-body {
+                padding: 16px;
+            }
+
+            .card-header {
+                padding: 16px;
+            }
+
+            .attendance-tabs {
+                width: 100%;
+            }
+
+            .tab-btn {
+                flex: 1;
+                text-align: center;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                max-width: 100%;
+            }
+
+            .login-card {
+                padding: 32px 24px;
+            }
+
+            .toast-container {
+                left: 16px;
+                right: 16px;
+            }
+
+            .toast {
+                min-width: auto;
+            }
+        }
+
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .mt-4 { margin-top: 16px; }
+        .mb-4 { margin-bottom: 16px; }
+        .hidden { display: none !important; }
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0,0,0,0);
+            border: 0;
+        }
+
+        /* Print Styles */
+        @media print {
+            .sidebar, .top-bar, .no-print {
+                display: none !important;
+            }
+            .main-content {
+                margin-left: 0 !important;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--cream);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        /* Dropdown for employee search */
+        .dropdown-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 0 0 var(--radius-md) var(--radius-md);
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+            box-shadow: var(--shadow-md);
+        }
+
+        .dropdown-list.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: var(--bg-light);
+        }
+
+        .dropdown-item strong {
+            display: block;
+            font-size: 14px;
+        }
+
+        .dropdown-item small {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+            opacity: 0.4;
+        }
+
+        .empty-state h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div class="login-container" id="loginPage">
+        <div class="login-card">
+            <div class="login-logo">
+                <div class="login-logo-icon">
+                    <i data-feather="shield"></i>
+                </div>
+                <h1>UPTN-TMS</h1>
+                <p>Sistema de Control de Asistencia</p>
+            </div>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="username">Usuario</label>
+                    <div class="input-wrapper">
+                        <i data-feather="user"></i>
+                        <input type="text" id="username" class="form-input" placeholder="Ingrese su usuario" autocomplete="username" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <div class="input-wrapper">
+                        <i data-feather="lock"></i>
+                        <input type="password" id="password" class="form-input" placeholder="Ingrese su contraseña" autocomplete="current-password" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i data-feather="log-in"></i>
+                    Iniciar Sesión
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div class="app-container" id="appContainer">
+        <!-- Mobile Overlay -->
+        <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar" role="navigation" aria-label="Menú principal">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <div class="sidebar-logo">
+                        <i data-feather="shield"></i>
+                    </div>
+                    <div class="sidebar-brand-text">
+                        <h2>UPTN-TMS</h2>
+                        <span>Control de Asistencia</span>
+                    </div>
+                </div>
+            </div>
+            <nav class="sidebar-nav" id="sidebarNav">
+                <!-- Navigation items will be rendered by JS based on role -->
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">MG</div>
+                    <div class="user-details">
+                        <div class="user-name" id="userName">María García</div>
+                        <div class="user-role" id="userRole">Administrador</div>
+                    </div>
+                    <button class="logout-btn" onclick="handleLogout()" aria-label="Cerrar sesión">
+                        <i data-feather="log-out"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <div style="display:flex;align-items:center;gap:16px;">
+                    <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Abrir menú">
+                        <i data-feather="menu"></i>
+                    </button>
+                    <div class="page-title">
+                        <h1 id="pageTitle">Dashboard</h1>
+                        <p id="pageSubtitle">Resumen general del sistema</p>
+                    </div>
+                </div>
+                <div class="top-bar-actions">
+                    <div class="current-date">
+                        <i data-feather="calendar"></i>
+                        <span id="currentDateDisplay"></span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-area">
+                <!-- Dashboard Section -->
+                <section class="page-section active" id="sectionDashboard">
+                    <div class="dashboard-grid" id="dashboardStats">
+                        <!-- Stats cards rendered by JS -->
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i data-feather="activity"></i> Últimas Actividades</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Hora</th>
+                                            <th>Empleado</th>
+                                            <th>Acción</th>
+                                            <th>Turno</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recentActivitiesTable">
+                                        <!-- Rendered by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Personal Management Section (Admin only) -->
+                <section class="page-section" id="sectionPersonal">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i data-feather="users"></i> Gestión de Personal</h3>
+                            <div class="filter-group">
+                                <div class="search-box">
+                                    <input type="text" class="form-input" placeholder="Buscar por cédula o nombre..." id="searchPersonal" oninput="filterPersonal()">
+                                </div>
+                                <select class="form-input" id="filterGremio" onchange="filterPersonal()" style="width:auto;min-width:150px;">
+                                    <option value="">Todos los gremios</option>
+                                </select>
+                                <label style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text-secondary);">
+                                    <input type="checkbox" id="showInactivePersonal" onchange="filterPersonal()">
+                                    Mostrar inactivos
+                                </label>
+                                <button class="btn btn-accent btn-sm" onclick="openModal('personalModal')">
+                                    <i data-feather="plus"></i> Agregar
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Cédula</th>
+                                            <th>Nombre Completo</th>
+                                            <th>Gremio / Cargo</th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="personalTableBody">
+                                        <!-- Rendered by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Gremios Management Section (Admin only) -->
+                <section class="page-section" id="sectionGremios">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i data-feather="briefcase"></i> Gestión de Gremios/Cargos</h3>
+                            <button class="btn btn-accent btn-sm" onclick="openModal('gremioModal')">
+                                <i data-feather="plus"></i> Agregar Gremio/Cargo
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Gremio</th>
+                                            <th>Cargo</th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="gremioTableBody">
+                                        <!-- Rendered by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Users Management Section (Admin only) -->
+                <section class="page-section" id="sectionUsers">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i data-feather="user-check"></i> Gestión de Usuarios</h3>
+                            <button class="btn btn-accent btn-sm" onclick="openModal('userModal')">
+                                <i data-feather="plus"></i> Agregar Usuario
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Usuario</th>
+                                            <th>Rol</th>
+                                            <th>Personal Asociado</th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="usersTableBody">
+                                        <!-- Rendered by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Attendance Registration Section -->
+                <section class="page-section" id="sectionRegistro">
+                    <div class="attendance-tabs">
+                        <button class="tab-btn active" data-turno="manana" onclick="switchTurnoTab(this)">Turno Mañana</button>
+                        <button class="tab-btn" data-turno="tarde" onclick="switchTurnoTab(this)">Turno Tarde</button>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h3 class="card-title"><i data-feather="edit-3"></i> Registro de Asistencia</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Buscar Empleado</label>
+                                <div class="search-box" style="position:relative;max-width:100%;">
+                                    <input type="text" class="form-input" id="employeeSearchInput" placeholder="Ingrese cédula o nombre..." oninput="searchEmployee(this.value)" autocomplete="off">
+                                    <div class="dropdown-list" id="employeeDropdown"></div>
+                                </div>
+                            </div>
+
+                            <div class="employee-search-result" id="employeeResult">
+                                <div class="employee-info-grid">
+                                    <div class="info-item">
+                                        <label>Nombre Completo</label>
+                                        <value id="resultName">-</value>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Cédula</label>
+                                        <value id="resultCedula">-</value>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Gremio</label>
+                                        <value id="resultGremio">-</value>
+                                    </div>
+                                    <div class="info-item">
+                                        <label>Cargo</label>
+                                        <value id="resultCargo">-</value>
+                                    </div>
+                                </div>
+                                <div class="attendance-actions">
+                                    <button class="btn btn-success" id="btnEntrada" onclick="registrarAsistencia('entrada')">
+                                        <i data-feather="log-in"></i> Registrar Entrada
+                                    </button>
+                                    <button class="btn btn-danger" id="btnSalida" onclick="registrarAsistencia('salida')" disabled>
+                                        <i data-feather="log-out"></i> Registrar Salida
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i data-feather="list"></i> Registros de Hoy</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Empleado</th>
+                                            <th>Cédula</th>
+                                            <th>Entrada</th>
+                                            <th>Salida</th>
+                                            <th>Horas</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="todayAttendanceTable">
+                                        <!-- Rendered by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Consultation Section -->
+                <section class="page-section" id="sectionConsulta">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i data-feather="search"></i> Consulta de Asistencias</h3>
+                            <div class="filter-group">
+                                <input type="date" class="form-input" id="fechaDesde" style="width:auto;" onchange="consultarAsistencias()">
+                                <span>a</span>
+                                <input type="date" class="form-input" id="fechaHasta" style="width:auto;" onchange="consultarAsistencias()">
+                                <select class="form-input" id="filtroGremioConsulta" style="width:auto;min-width:140px;" onchange="consultarAsistencias()">
+                                    <option value="">Todos los gremios</option>
+                                    <option value="Docente">Docente</option>
+                                    <option value="Obrero">Obrero</option>
+                                    <option value="Administrativo">Administrativo</option>
+                                </select>
+                                <select class="form-input" id="filtroEmpleadoConsulta" style="width:auto;min-width:180px;" onchange="consultarAsistencias()">
+                                    <option value="">Todos los empleados</option>
+                                </select>
+                                <button class="btn btn-outline btn-sm" onclick="exportarCSV()">
+                                    <i data-feather="download"></i> Exportar CSV
+                                </button>
+                                <button class="btn btn-outline btn-sm" onclick="window.print()">
+                                    <i data-feather="printer"></i> Imprimir
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Fecha</th>
+                                            <th>Empleado</th>
+                                            <th>Gremio</th>
+                                            <th>Ent. Mañana</th>
+                                            <th>Sal. Mañana</th>
+                                            <th>Hrs. Mañana</th>
+                                            <th>Ent. Tarde</th>
+                                            <th>Sal. Tarde</th>
+                                            <th>Hrs. Tarde</th>
+                                            <th>Total Horas</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="consultaTableBody">
+                                        <!-- Rendered by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Reports Section -->
+                <section class="page-section" id="sectionReportes">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h3 class="card-title"><i data-feather="bar-chart-2"></i> Filtros de Reporte</h3>
+                            <div class="filter-group">
+                                <input type="date" class="form-input" id="repFechaDesde" style="width:auto;" onchange="generarReportes()">
+                                <span>a</span>
+                                <input type="date" class="form-input" id="repFechaHasta" style="width:auto;" onchange="generarReportes()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="report-stats" id="reportStatsGrid">
+                        <!-- Report stats rendered by JS -->
+                    </div>
+
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:20px;margin-top:24px;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title"><i data-feather="award"></i> Top Empleados por Horas</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Empleado</th>
+                                                <th>Total Horas</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="topEmployeesTable">
+                                            <!-- Rendered by JS -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title"><i data-feather="alert-triangle"></i> Empleados con Más Inasistencias</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Empleado</th>
+                                                <th>Inasistencias</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="absentEmployeesTable">
+                                            <!-- Rendered by JS -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- Personal Modal -->
+    <div class="modal-overlay" id="personalModal" role="dialog" aria-modal="true" aria-labelledby="personalModalTitle">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="personalModalTitle">Agregar Personal</h3>
+                <button class="modal-close" onclick="closeModal('personalModal')" aria-label="Cerrar">
+                    <i data-feather="x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="personalForm" onsubmit="savePersonal(event)">
+                    <input type="hidden" id="personalId">
+                    <div class="form-group">
+                        <label for="personalCedula">Cédula *</label>
+                        <input type="text" class="form-input" id="personalCedula" placeholder="Ej: V-12345678" required pattern="V-[0-9]{7,8}" title="Formato: V-12345678">
+                    </div>
+                    <div class="form-group">
+                        <label for="personalNombre">Nombre Completo *</label>
+                        <input type="text" class="form-input" id="personalNombre" placeholder="Nombre completo" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="personalGremio">Gremio/Cargo *</label>
+                        <select class="form-input" id="personalGremio" required>
+                            <option value="">Seleccione...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="personalEstado">Estado</label>
+                        <select class="form-input" id="personalEstado">
+                            <option value="a">Activo</option>
+                            <option value="i">Inactivo</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('personalModal')">Cancelar</button>
+                <button class="btn btn-accent" onclick="document.getElementById('personalForm').dispatchEvent(new Event('submit'))">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gremio Modal -->
+    <div class="modal-overlay" id="gremioModal" role="dialog" aria-modal="true" aria-labelledby="gremioModalTitle">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="gremioModalTitle">Agregar Gremio/Cargo</h3>
+                <button class="modal-close" onclick="closeModal('gremioModal')" aria-label="Cerrar">
+                    <i data-feather="x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="gremioForm" onsubmit="saveGremio(event)">
+                    <input type="hidden" id="gremioId">
+                    <div class="form-group">
+                        <label for="gremioNombre">Gremio *</label>
+                        <select class="form-input" id="gremioNombre" required>
+                            <option value="">Seleccione...</option>
+                            <option value="Docente">Docente</option>
+                            <option value="Obrero">Obrero</option>
+                            <option value="Administrativo">Administrativo</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="gremioCargo">Cargo Específico *</label>
+                        <input type="text" class="form-input" id="gremioCargo" placeholder="Ej: Profesor Instructor" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="gremioEstado">Estado</label>
+                        <select class="form-input" id="gremioEstado">
+                            <option value="a">Activo</option>
+                            <option value="i">Inactivo</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('gremioModal')">Cancelar</button>
+                <button class="btn btn-accent" onclick="document.getElementById('gremioForm').dispatchEvent(new Event('submit'))">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Modal -->
+    <div class="modal-overlay" id="userModal" role="dialog" aria-modal="true" aria-labelledby="userModalTitle">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="userModalTitle">Agregar Usuario</h3>
+                <button class="modal-close" onclick="closeModal('userModal')" aria-label="Cerrar">
+                    <i data-feather="x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="userForm" onsubmit="saveUser(event)">
+                    <input type="hidden" id="userId">
+                    <div class="form-group">
+                        <label for="userUsername">Nombre de Usuario *</label>
+                        <input type="text" class="form-input" id="userUsername" placeholder="Nombre de usuario" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="userPassword">Contraseña *</label>
+                        <input type="password" class="form-input" id="userPassword" placeholder="Contraseña" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="userRol">Rol *</label>
+                        <select class="form-input" id="userRol" required>
+                            <option value="">Seleccione...</option>
+                            <option value="admin">Administrador</option>
+                            <option value="vigilante">Vigilante</option>
+                            <option value="jefeRRHH">Jefe RRHH</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="userPersonal">Personal Asociado *</label>
+                        <select class="form-input" id="userPersonal" required>
+                            <option value="">Seleccione...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="userEstado">Estado</label>
+                        <select class="form-input" id="userEstado">
+                            <option value="a">Activo</option>
+                            <option value="i">Inactivo</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('userModal')">Cancelar</button>
+                <button class="btn btn-accent" onclick="document.getElementById('userForm').dispatchEvent(new Event('submit'))">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Delete Modal -->
+    <div class="modal-overlay" id="confirmModal" role="dialog" aria-modal="true">
+        <div class="modal" style="max-width:400px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Confirmar Eliminación</h3>
+                <button class="modal-close" onclick="closeModal('confirmModal')" aria-label="Cerrar">
+                    <i data-feather="x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage">¿Está seguro que desea eliminar este registro? Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('confirmModal')">Cancelar</button>
+                <button class="btn btn-danger" id="confirmDeleteBtn">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+    <script>
+        // ============================================
+        // DATA INITIALIZATION & STORAGE
+        // ============================================
+        
+        const STORAGE_KEYS = {
+            GREMIOS: 'uptn_gremios',
+            PERSONAL: 'uptn_personal',
+            USERS: 'uptn_users',
+            ASISTENCIAS_MANANA: 'uptn_asistencias_manana',
+            ASISTENCIAS_TARDE: 'uptn_asistencias_tarde'
+        };
+
+        // Seed Data
+        const seedData = {
+            gremios: [
+                { id: 1, nombre: 'Docente', cargo: 'Profesor Instructor', estado: 'a' },
+                { id: 2, nombre: 'Docente', cargo: 'Profesor Agregado', estado: 'a' },
+                { id: 3, nombre: 'Obrero', cargo: 'Obrero Mantenimiento', estado: 'a' },
+                { id: 4, nombre: 'Obrero', cargo: 'Obrero Limpieza', estado: 'a' },
+                { id: 5, nombre: 'Administrativo', cargo: 'Analista RRHH', estado: 'a' },
+                { id: 6, nombre: 'Administrativo', cargo: 'Asistente Administrativo', estado: 'a' }
+            ],
+            personal: [
+                { id: 1, cedula: 'V-12345678', nombre: 'María García', gremio_id: 1, estado: 'a' },
+                { id: 2, cedula: 'V-23456789', nombre: 'José Rodríguez', gremio_id: 2, estado: 'a' },
+                { id: 3, cedula: 'V-34567890', nombre: 'Ana Martínez', gremio_id: 3, estado: 'a' },
+                { id: 4, cedula: 'V-45678901', nombre: 'Carlos López', gremio_id: 4, estado: 'a' },
+                { id: 5, cedula: 'V-56789012', nombre: 'Patricia Hernández', gremio_id: 5, estado: 'a' },
+                { id: 6, cedula: 'V-67890123', nombre: 'Luis Torres', gremio_id: 6, estado: 'a' },
+                { id: 7, cedula: 'V-78901234', nombre: 'Carmen Silva', gremio_id: 1, estado: 'a' },
+                { id: 8, cedula: 'V-89012345', nombre: 'Pedro Vargas', gremio_id: 3, estado: 'a' },
+                { id: 9, cedula: 'V-90123456', nombre: 'Laura Méndez', gremio_id: 6, estado: 'a' },
+                { id: 10, cedula: 'V-11223344', nombre: 'Roberto Castillo', gremio_id: 2, estado: 'a' },
+                { id: 11, cedula: 'V-55667788', nombre: 'Elena Ríos', gremio_id: 4, estado: 'i' },
+                { id: 12, cedula: 'V-99887766', nombre: 'Fernando Gil', gremio_id: 5, estado: 'a' }
+            ],
+            users: [
+                { id: 1, username: 'admin', password: 'admin123', rol: 'admin', personal_id: 1, estado: 'a' },
+                { id: 2, username: 'vigilante1', password: 'vigi123', rol: 'vigilante', personal_id: 4, estado: 'a' },
+                { id: 3, username: 'jefe_rrhh', password: 'rrhh123', rol: 'jefeRRHH', personal_id: 5, estado: 'a' }
+            ]
+        };
+
+        // Initialize storage with seed data if empty
+        function initializeStorage() {
+            if (!localStorage.getItem(STORAGE_KEYS.GREMIOS)) {
+                localStorage.setItem(STORAGE_KEYS.GREMIOS, JSON.stringify(seedData.gremios));
+            }
+            if (!localStorage.getItem(STORAGE_KEYS.PERSONAL)) {
+                localStorage.setItem(STORAGE_KEYS.PERSONAL, JSON.stringify(seedData.personal));
+            }
+            if (!localStorage.getItem(STORAGE_KEYS.USERS)) {
+                localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(seedData.users));
+            }
+            if (!localStorage.getItem(STORAGE_KEYS.ASISTENCIAS_MANANA)) {
+                generateSampleAttendances();
+            }
+            if (!localStorage.getItem(STORAGE_KEYS.ASISTENCIAS_TARDE)) {
+                localStorage.setItem(STORAGE_KEYS.ASISTENCIAS_TARDE, JSON.stringify([]));
+            }
+        }
+
+        // Generate sample attendance records for last 7 days
+        function generateSampleAttendances() {
+            const asistenciasManana = [];
+            const asistenciasTarde = [];
+            const today = new Date();
+            
+            for (let daysBack = 6; daysBack >= 0; daysBack--) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - daysBack);
+                const dateStr = formatDateForStorage(date);
+                
+                const activePersonal = getActivePersonal();
+                
+                activePersonal.forEach((persona, idx) => {
+                    // Skip some random employees to simulate absences
+                    if (Math.random() > 0.85) return;
+                    
+                    // Morning attendance
+                    const horaLlegadaManana = getRandomTime(6, 30, 8, 30);
+                    const tieneSalidaManana = Math.random() > 0.15;
+                    
+                    asistenciasManana.push({
+                        id: Date.now() + Math.random(),
+                        personal_id: persona.id,
+                        fecha: dateStr,
+                        tm_hor_lleg: horaLlegadaManana,
+                        tm_hor_sal: tieneSalidaManana ? getRandomTime(11, 30, 13, 0) : null,
+                        hor_tra_tm: null,
+                        estado: 'a'
+                    });
+                    
+                    // Afternoon attendance (some employees)
+                    if (Math.random() > 0.3 && persona.id % 2 === 0) {
+                        const horaLlegadaTarde = getRandomTime(13, 30, 14, 30);
+                        const tieneSalidaTarde = Math.random() > 0.1;
+                        
+                        asistenciasTarde.push({
+                            id: Date.now() + Math.random() + 10000,
+                            personal_id: persona.id,
+                            fecha: dateStr,
+                            tt_hor_lleg: horaLlegadaTarde,
+                            tt_hor_sal: tieneSalidaTarde ? getRandomTime(17, 30, 19, 0) : null,
+                            hor_tra_tt: null,
+                            estado: 'a'
+                        });
+                    }
+                });
+            }
+            
+            // Calculate hours worked
+            asistenciasManana.forEach(a => {
+                if (a.tm_hor_sal) {
+                    a.hor_tra_tm = calculateHoursDiff(a.tm_hor_lleg, a.tm_hor_sal);
+                }
+            });
+            
+            asistenciasTarde.forEach(a => {
+                if (a.tt_hor_sal) {
+                    a.hor_tra_tt = calculateHoursDiff(a.tt_hor_lleg, a.tt_hor_sal);
+                }
+            });
+            
+            localStorage.setItem(STORAGE_KEYS.ASISTENCIAS_MANANA, JSON.stringify(asistenciasManana));
+            localStorage.setItem(STORAGE_KEYS.ASISTENCIAS_TARDE, JSON.stringify(asistenciasTarde));
+        }
+
+        function getRandomTime(startHour, startMin, endHour, endMin) {
+            const startTotal = startHour * 60 + startMin;
+            const endTotal = endHour * 60 + endMin;
+            const randomMinutes = Math.floor(Math.random() * (endTotal - startTotal)) + startTotal;
+            const hours = Math.floor(randomMinutes / 60);
+            const mins = randomMinutes % 60;
+            return `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+        }
+
+        // ============================================
+        // DATA ACCESS FUNCTIONS
+        // ============================================
+
+        function getData(key) {
+            return JSON.parse(localStorage.getItem(key) || '[]');
+        }
+
+        function setData(key, data) {
+            localStorage.setItem(key, JSON.stringify(data));
+        }
+
+        function getGremios() {
+            return getData(STORAGE_KEYS.GREMIOS).filter(g => g.estado === 'a');
+        }
+
+        function getAllGremios() {
+            return getData(STORAGE_KEYS.GREMIOS);
+        }
+
+        function getPersonal(includeInactive = false) {
+            let personal = getData(STORAGE_KEYS.PERSONAL);
+            if (!includeInactive) {
+                personal = personal.filter(p => p.estado === 'a');
+            }
+            return personal;
+        }
+
+        function getActivePersonal() {
+            return getData(STORAGE_KEYS.PERSONAL).filter(p => p.estado === 'a');
+        }
+
+        function getUsers() {
+            return getData(STORAGE_KEYS.USERS);
+        }
+
+        function getAsistenciasManana() {
+            return getData(STORAGE_KEYS.ASISTENCIAS_MANANA);
+        }
+
+        function getAsistenciasTarde() {
+            return getData(STORAGE_KEYS.ASISTENCIAS_TARDE);
+        }
+
+        function getGremioById(id) {
+            return getAllGremios().find(g => g.id === parseInt(id));
+        }
+
+        function getPersonalById(id) {
+            return getData(STORAGE_KEYS.PERSONAL).find(p => p.id === parseInt(id));
+        }
+
+        function getUserById(id) {
+            return getUsers().find(u => u.id === parseInt(id));
+        }
+
+        // ============================================
+        // UTILITY FUNCTIONS
+        // ============================================
+
+        function formatDateForStorage(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        function formatDisplayDate(dateStr) {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateStr + 'T00:00:00').toLocaleDateString('es-VE', options);
+        }
+
+        function formatShortDate(dateStr) {
+            const options = { day: '2-digit', month: 'short', year: 'numeric' };
+            return new Date(dateStr + 'T00:00:00').toLocaleDateString('es-VE', options);
+        }
+
+        function getCurrentDateTime() {
+            const now = new Date();
+            const timeAmericaCaracas = now.toLocaleTimeString('en-US', { 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit',
+                timeZone: 'America/Caracas'
+            });
+            return timeAmericaCaracas;
+        }
+
+        function getCurrentDate() {
+            const now = new Date();
+            return now.toLocaleDateString('es-VE', { 
+                day: '2-digit', 
+                month: 'short', 
+                year: 'numeric',
+                timeZone: 'America/Caracas'
+            });
+        }
+
+        function calculateHoursDiff(startTime, endTime) {
+            if (!startTime || !endTime) return null;
+            const [sh, sm] = startTime.split(':').map(Number);
+            const [eh, em] = endTime.split(':').map(Number);
+            const startMinutes = sh * 60 + sm;
+            const endMinutes = eh * 60 + em;
+            const diffMinutes = endMinutes - startMinutes;
+            if (diffMinutes <= 0) return null;
+            return (diffMinutes / 60).toFixed(2);
+        }
+
+        function getRoleDisplayName(rol) {
+            const roles = {
+                admin: 'Administrador',
+                vigilante: 'Vigilante',
+                jefeRRHH: 'Jefe RRHH'
+            };
+            return roles[rol] || rol;
+        }
+
+        function getInitials(name) {
+            return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+        }
+
+        // ============================================
+        // TOAST NOTIFICATIONS
+        // ============================================
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icons = {
+                success: 'check-circle',
+                error: 'x-circle',
+                warning: 'alert-circle',
+                info: 'info'
+            };
+            
+            toast.innerHTML = `
+                <i data-feather="${icons[type]}" class="toast-icon"></i>
+                <span class="toast-message">${message}</span>
+            `;
+            
+            container.appendChild(toast);
+            feather.replace({ 'stroke-width': 2 });
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ============================================
+        // MODAL FUNCTIONS
+        // ============================================
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        let deleteCallback = null;
+
+        function confirmDelete(message, callback) {
+            document.getElementById('confirmMessage').textContent = message;
+            deleteCallback = callback;
+            openModal('confirmModal');
+            document.getElementById('confirmDeleteBtn').onclick = () => {
+                if (deleteCallback) deleteCallback();
+                closeModal('confirmModal');
+            };
+        }
+
+        // ============================================
+        // AUTHENTICATION
+        // ============================================
+
+        let currentUser = null;
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            
+            const users = getUsers();
+            const user = users.find(u => u.username === username && u.password === password && u.estado === 'a');
+            
+            if (user) {
+                currentUser = user;
+                showApp();
+                showToast(`Bienvenido, ${getPersonalById(user.personal_id)?.nombre || user.username}`);
+            } else {
+                document.getElementById('username').classList.add('error');
+                document.getElementById('password').classList.add('error');
+                showToast('Credenciales inválidas', 'error');
+            }
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('appContainer').classList.remove('active');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('username').classList.remove('error');
+            document.getElementById('password').classList.remove('error');
+        }
+
+        function showApp() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('appContainer').classList.add('active');
+            
+            // Update user info in sidebar
+            const personal = getPersonalById(currentUser.personal_id);
+            if (personal) {
+                document.getElementById('userName').textContent = personal.nombre;
+                document.getElementById('userAvatar').textContent = getInitials(personal.nombre);
+            }
+            document.getElementById('userRole').textContent = getRoleDisplayName(currentUser.rol);
+            
+            renderNavigation();
+            navigateTo('dashboard');
+            updateCurrentDate();
+        }
+
+        // ============================================
+        // NAVIGATION
+        // ============================================
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('mobileOverlay').classList.toggle('active');
+        }
+
+        function renderNavigation() {
+            const nav = document.getElementById('sidebarNav');
+            const rol = currentUser.rol;
+            
+            let navItems = [
+                { id: 'dashboard', icon: 'home', label: 'Dashboard' }
+            ];
+            
+            if (rol === 'vigilante' || rol === 'admin') {
+                navItems.push({ id: 'registro', icon: 'edit-3', label: 'Registro de Asistencia' });
+            }
+            
+            if (rol === 'jefeRRHH' || rol === 'admin') {
+                navItems.push({ id: 'consulta', icon: 'search', label: 'Consulta de Asistencias' });
+                navItems.push({ id: 'reportes', icon: 'bar-chart-2', label: 'Reportes' });
+            }
+            
+            if (rol === 'admin') {
+                navItems.push(
+                    { divider: true, label: 'ADMINISTRACIÓN' },
+                    { id: 'personal', icon: 'users', label: 'Gestión de Personal' },
+                    { id: 'gremios', icon: 'briefcase', label: 'Gestión de Gremios' },
+                    { id: 'users', icon: 'user-check', label: 'Gestión de Usuarios' }
+                );
+            }
+            
+            nav.innerHTML = navItems.map(item => {
+                if (item.divider) {
+                    return `<div class="nav-section-title">${item.label}</div>`;
+                }
+                return `<a class="nav-item" data-page="${item.id}" onclick="navigateTo('${item.id}')">
+                    <i data-feather="${item.icon}"></i>
+                    ${item.label}
+                </a>`;
+            }).join('');
+            
+            feather.replace({ 'stroke-width': 2 });
+        }
+
+        function navigateTo(pageId) {
+            // Hide all sections
+            document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+            
+            // Show target section
+            const section = document.getElementById(`section${pageId.charAt(0).toUpperCase() + pageId.slice(1)}`);
+            if (section) {
+                section.classList.add('active');
+            }
+            
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.page === pageId);
+            });
+            
+            // Update page title
+            const titles = {
+                dashboard: ['Dashboard', 'Resumen general del sistema'],
+                personal: ['Gestión de Personal', 'Administrar empleados del sistema'],
+                gremios: ['Gestión de Gremios', 'Administrar gremios y cargos'],
+                users: ['Gestión de Usuarios', 'Administrar usuarios del sistema'],
+                registro: ['Registro de Asistencia', 'Registrar entrada y salida de empleados'],
+                consulta: ['Consulta de Asistencias', 'Consultar registros históricos'],
+                reportes: ['Reportes', 'Estadísticas y análisis de asistencia']
+            };
+            
+            if (titles[pageId]) {
+                document.getElementById('pageTitle').textContent = titles[pageId][0];
+                document.getElementById('pageSubtitle').textContent = titles[pageId][1];
+            }
+            
+            // Load section data
+            switch(pageId) {
+                case 'dashboard':
+                    loadDashboard();
+                    break;
+                case 'personal':
+                    loadPersonalTable();
+                    break;
+                case 'gremios':
+                    loadGremiosTable();
+                    break;
+                case 'users':
+                    loadUsersTable();
+                    break;
+                case 'registro':
+                    loadTodayAttendance();
+                    break;
+                case 'consulta':
+                    loadConsultaFilters();
+                    consultarAsistencias();
+                    break;
+                case 'reportes':
+                    loadReportDates();
+                    generarReportes();
+                    break;
+            }
+            
+            // Close mobile sidebar
+            if (window.innerWidth <= 1024) {
+                toggleSidebar();
+            }
+        }
+
+        function updateCurrentDate() {
+            document.getElementById('currentDateDisplay').textContent = getCurrentDate();
+        }
+
+        // ============================================
+        // DASHBOARD
+        // ============================================
+
+        function loadDashboard() {
+            const personal = getActivePersonal();
+            const today = formatDateForStorage(new Date());
+            const asistenciasManana = getAsistenciasManana().filter(a => a.fecha === today);
+            const asistenciasTarde = getAsistenciasTarde().filter(a => a.fecha === today);
+            
+            const stats = [
+                { label: 'Personal Activo', value: personal.length, icon: 'users', type: 'primary' },
+                { label: 'Asistencias Mañana Hoy', value: asistenciasManana.length, icon: 'sunrise', type: 'success' },
+                { label: 'Asistencias Tarde Hoy', value: asistenciasTarde.length, icon: 'sunset', type: 'warning' },
+                { label: 'Inasistencias Hoy', value: Math.max(0, personal.length - asistenciasManana.length), icon: 'x-circle', type: 'danger' }
+            ];
+            
+            document.getElementById('dashboardStats').innerHTML = stats.map(stat => `
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon ${stat.type}">
+                            <i data-feather="${stat.icon}"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">${stat.value}</div>
+                    <div class="stat-label">${stat.label}</div>
+                </div>
+            `).join('');
+            
+            feather.replace({ 'stroke-width': 2 });
+            
+            // Recent activities
+            loadRecentActivities();
+        }
+
+        function loadRecentActivities() {
+            const allAsistencias = [
+                ...getAsistenciasManana().slice(-10),
+                ...getAsistenciasTarde().slice(-10)
+            ].sort((a, b) => {
+                const timeA = a.tm_hor_lleg || a.tt_hor_lleg || '';
+                const timeB = b.tm_hor_lleg || b.tt_hor_lleg || '';
+                return timeB.localeCompare(timeA);
+            }).slice(0, 8);
+            
+            const tbody = document.getElementById('recentActivitiesTable');
+            
+            if (allAsistencias.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="color:var(--text-secondary);padding:32px;">No hay actividades recientes</td></tr>`;
+                return;
+            }
+            
+            tbody.innerHTML = allAsistencias.map(a => {
+                const personal = getPersonalById(a.personal_id);
+                const isMorning = a.tm_hor_lleg !== undefined;
+                const hora = isMorning ? a.tm_hor_lleg : a.tt_hor_lleg;
+                const turno = isMorning ? 'Mañana' : 'Tarde';
+                const accion = a.tm_hor_sal || a.tt_hor_sal ? 'Salida registrada' : 'Entrada registrada';
+                
+                return `<tr>
+                    <td>${hora || '-'}</td>
+                    <td>${personal?.nombre || 'N/A'}</td>
+                    <td>${accion}</td>
+                    <td><span class="badge badge-${isMorning ? 'warning' : 'primary'}">${turno}</span></td>
+                    <td><span class="badge badge-success">Completado</span></td>
+                </tr>`;
+            }).join('');
+        }
+
+        // ============================================
+        // PERSONAL MANAGEMENT
+        // ============================================
+
+        function loadPersonalTable() {
+            const showInactive = document.getElementById('showInactivePersonal')?.checked || false;
+            const personal = getPersonal(showInactive);
+            const searchTerm = document.getElementById('searchPersonal')?.value.toLowerCase() || '';
+            const filterGremio = document.getElementById('filterGremio')?.value || '';
+            
+            // Populate gremio filter
+            const gremioSelect = document.getElementById('filterGremio');
+            if (gremioSelect.options.length <= 1) {
+                const gremios = getGremios();
+                gremios.forEach(g => {
+                    const opt = document.createElement('option');
+                    opt.value = g.nombre;
+                    opt.textContent = g.nombre;
+                    gremioSelect.appendChild(opt);
+                });
+            }
+            
+            let filtered = personal.filter(p => {
+                const matchSearch = !searchTerm || 
+                    p.cedula.toLowerCase().includes(searchTerm) || 
+                    p.nombre.toLowerCase().includes(searchTerm);
+                const gremio = getGremioById(p.gremio_id);
+                const matchGremio = !filterGremio || gremio?.nombre === filterGremio;
+                return matchSearch && matchGremio;
+            });
+            
+            const tbody = document.getElementById('personalTableBody');
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i data-feather="inbox"></i><h3>No hay registros</h3><p>No se encontraron resultados para los filtros aplicados.</p></div></td></tr>`;
+                feather.replace({ 'stroke-width': 2 });
+                return;
+            }
+            
+            tbody.innerHTML = filtered.map(p => {
+                const gremio = getGremioById(p.gremio_id);
+                return `<tr>
+                    <td>${p.id}</td>
+                    <td><strong>${p.cedula}</strong></td>
+                    <td>${p.nombre}</td>
+                    <td>${gremio?.nombre || 'N/A'}<br><small style="color:var(--text-secondary)">${gremio?.cargo || ''}</small></td>
+                    <td><span class="badge ${p.estado === 'a' ? 'badge-success' : 'badge-danger'}">${p.estado === 'a' ? 'Activo' : 'Inactivo'}</span></td>
+                    <td>
+                        <div style="display:flex;gap:8px;">
+                            <button class="btn btn-icon btn-outline" onclick="editPersonal(${p.id})" aria-label="Editar">
+                                <i data-feather="edit-2"></i>
+                            </button>
+                            <button class="btn btn-icon btn-outline" onclick="deletePersonal(${p.id})" aria-label="Eliminar" style="--hover-bg:#fee2e2;--hover-color:var(--danger);">
+                                <i data-feather="trash-2"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+            
+            feather.replace({ 'stroke-width': 2 });
+        }
+
+        function filterPersonal() {
+            loadPersonalTable();
+        }
+
+        function editPersonal(id) {
+            const personal = getPersonalById(id);
+            if (!personal) return;
+            
+            document.getElementById('personalModalTitle').textContent = 'Editar Personal';
+            document.getElementById('personalId').value = personal.id;
+            document.getElementById('personalCedula').value = personal.cedula;
+            document.getElementById('personalNombre').value = personal.nombre;
+            document.getElementById('personalEstado').value = personal.estado;
+            
+            populateGremioSelect('personalGremio');
+            document.getElementById('personalGremio').value = personal.gremio_id;
+            
+            openModal('personalModal');
+        }
+
+        function savePersonal(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('personalId').value;
+            const cedula = document.getElementById('personalCedula').value.toUpperCase();
+            const nombre = document.getElementById('personalNombre').value.trim();
+            const gremio_id = parseInt(document.getElementById('personalGremio').value);
+            const estado = document.getElementById('personalEstado').value;
+            
+            let personal = getPersonal(true);
+            
+            if (id) {
+                // Edit
+                const index = personal.findIndex(p => p.id === parseInt(id));
+                if (index !== -1) {
+                    personal[index] = { ...personal[index], cedula, nombre, gremio_id, estado };
+                    showToast('Personal actualizado correctamente');
+                }
+            } else {
+                // Add
+                const newId = Math.max(...personal.map(p => p.id), 0) + 1;
+                personal.push({ id: newId, cedula, nombre, gremio_id, estado: estado || 'a' });
+                showToast('Personal agregado correctamente');
+            }
+            
+            setData(STORAGE_KEYS.PERSONAL, personal);
+            closeModal('personalModal');
+            resetPersonalForm();
+            loadPersonalTable();
+        }
+
+        function deletePersonal(id) {
+            const personal = getPersonalById(id);
+            if (!personal) return;
+            
+            confirmDelete(`¿Desea eliminar a "${personal.nombre}" del sistema?`, () => {
+                let personalList = getPersonal(true);
+                personalList = personalList.filter(p => p.id !== id);
+                setData(STORAGE_KEYS.PERSONAL, personalList);
+                showToast('Personal eliminado correctamente');
+                loadPersonalTable();
+            });
+        }
+
+        function resetPersonalForm() {
+            document.getElementById('personalForm').reset();
+            document.getElementById('personalId').value = '';
+            document.getElementById('personalModalTitle').textContent = 'Agregar Personal';
+        }
+
+        function populateGremioSelect(selectId) {
+            const select = document.getElementById(selectId);
+            const currentValue = select.value;
+            select.innerHTML = '<option value="">Seleccione...</option>';
+            
+            getGremios().forEach(g => {
+                const opt = document.createElement('option');
+                opt.value = g.id;
+                opt.textContent = `${g.nombre} - ${g.cargo}`;
+                select.appendChild(opt);
+            });
+            
+            if (currentValue) select.value = currentValue;
+        }
+
+        // Open modal with fresh gremio list
+        document.querySelector('[onclick*="personalModal"]')?.addEventListener('click', () => {
+            resetPersonalForm();
+            populateGremioSelect('personalGremio');
+        });
+
+        // ============================================
+        // GREMIOS MANAGEMENT
+        // ============================================
+
+        function loadGremiosTable() {
+            const gremios = getAllGremios();
+            const tbody = document.getElementById('gremioTableBody');
+            
+            if (gremios.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i data-feather="briefcase"></i><h3>No hay gremios</h3><p>Agregue gremios y cargos al sistema.</p></div></td></tr>`;
+                feather.replace({ 'stroke-width': 2 });
+                return;
+            }
+            
+            tbody.innerHTML = gremios.map(g => {
+                const personalCount = getPersonal(true).filter(p => p.gremio_id === g.id && p.estado === 'a').length;
+                return `<tr>
+                    <td>${g.id}</td>
+                    <td><span class="badge badge-primary">${g.nombre}</span></td>
+                    <td>${g.cargo}</td>
+                    <td><span class="badge ${g.estado === 'a' ? 'badge-success' : 'badge-danger'}">${g.estado === 'a' ? 'Activo' : 'Inactivo'}</span></td>
+                    <td>
+                        <div style="display:flex;gap:8px;">
+                            <button class="btn btn-icon btn-outline" onclick="editGremio(${g.id})" aria-label="Editar">
+                                <i data-feather="edit-2"></i>
+                            </button>
+                            <button class="btn btn-icon btn-outline" onclick="deleteGremio(${g.id})" aria-label="Eliminar" ${personalCount > 0 ? 'disabled title="Hay personal asociado"' : ''}>
+                                <i data-feather="trash-2"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+            
+            feather.replace({ 'stroke-width': 2 });
+        }
+
+        function editGremio(id) {
+            const gremio = getGremioById(id);
+            if (!gremio) return;
+            
+            document.getElementById('gremioModalTitle').textContent = 'Editar Gremio/Cargo';
+            document.getElementById('gremioId').value = gremio.id;
+            document.getElementById('gremioNombre').value = gremio.nombre;
+            document.getElementById('gremioCargo').value = gremio.cargo;
+            document.getElementById('gremioEstado').value = gremio.estado;
+            
+            openModal('gremioModal');
+        }
+
+        function saveGremio(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('gremioId').value;
+            const nombre = document.getElementById('gremioNombre').value;
+            const cargo = document.getElementById('gremioCargo').value.trim();
+            const estado = document.getElementById('gremioEstado').value;
+            
+            let gremios = getAllGremios();
+            
+            if (id) {
+                const index = gremios.findIndex(g => g.id === parseInt(id));
+                if (index !== -1) {
+                    gremios[index] = { ...gremios[index], nombre, cargo, estado };
+                    showToast('Gremio actualizado correctamente');
+                }
+            } else {
+                const newId = Math.max(...gremios.map(g => g.id), 0) + 1;
+                gremios.push({ id: newId, nombre, cargo, estado: estado || 'a' });
+                showToast('Gremio agregado correctamente');
+            }
+            
+            setData(STORAGE_KEYS.GREMIOS, gremios);
+            closeModal('gremioModal');
+            resetGremioForm();
+            loadGremiosTable();
+        }
+
+        function deleteGremio(id) {
+            const gremio = getGremioById(id);
+            if (!gremio) return;
+            
+            const personalCount = getPersonal(true).filter(p => p.gremio_id === id && p.estado === 'a').length;
+            if (personalCount > 0) {
+                showToast(`No se puede eliminar: hay ${personalCount} empleado(s) activo(s) con este gremio`, 'error');
+                return;
+            }
+            
+            confirmDelete(`¿Desea eliminar el gremio/cargo "${gremio.nombre} - ${gremiocargo}"?`, () => {
+                let gremios = getAllGremios();
+                gremios = gremios.filter(g => g.id !== id);
+                setData(STORAGE_KEYS.GREMIOS, gremios);
+                showToast('Gremio eliminado correctamente');
+                loadGremiosTable();
+            });
+        }
+
+        function resetGremioForm() {
+            document.getElementById('gremioForm').reset();
+            document.getElementById('gremioId').value = '';
+            document.getElementById('gremioModalTitle').textContent = 'Agregar Gremio/Cargo';
+        }
+
+        // ============================================
+        // USERS MANAGEMENT
+        // ============================================
+
+        function loadUsersTable() {
+            const users = getUsers();
+            const tbody = document.getElementById('usersTableBody');
+            
+            if (users.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i data-feather="user-check"></i><h3>No hay usuarios</h3><p>Agregue usuarios al sistema.</p></div></td></tr>`;
+                feather.replace({ 'stroke-width': 2 });
+                return;
+            }
+            
+            tbody.innerHTML = users.map(u => {
+                const personal = getPersonalById(u.personal_id);
+                return `<tr>
+                    <td>${u.id}</td>
+                    <td><strong>${u.username}</strong></td>
+                    <td><span class="badge badge-gold">${getRoleDisplayName(u.rol)}</span></td>
+                    <td>${personal?.nombre || 'N/A'}</td>
+                    <td><span class="badge ${u.estado === 'a' ? 'badge-success' : 'badge-danger'}">${u.estado === 'a' ? 'Activo' : 'Inactivo'}</span></td>
+                    <td>
+                        <div style="display:flex;gap:8px;">
+                            <button class="btn btn-icon btn-outline" onclick="editUser(${u.id})" aria-label="Editar">
+                                <i data-feather="edit-2"></i>
+                            </button>
+                            <button class="btn btn-icon btn-outline" onclick="deleteUser(${u.id})" aria-label="Eliminar">
+                                <i data-feather="trash-2"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+            
+            feather.replace({ 'stroke-width': 2 });
+        }
+
+        function editUser(id) {
+            const user = getUserById(id);
+            if (!user) return;
+            
+            document.getElementById('userModalTitle').textContent = 'Editar Usuario';
+            document.getElementById('userId').value = user.id;
+            document.getElementById('userUsername').value = user.username;
+            document.getElementById('userPassword').value = user.password;
+            document.getElementById('userRol').value = user.rol;
+            document.getElementById('userEstado').value = user.estado;
+            
+            populatePersonalSelect('userPersonal');
+            document.getElementById('userPersonal').value = user.personal_id;
+            
+            openModal('userModal');
+        }
+
+        function saveUser(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('userId').value;
+            const username = document.getElementById('userUsername').value.trim();
+            const password = document.getElementById('userPassword').value;
+            const rol = document.getElementById('userRol').value;
+            const personal_id = parseInt(document.getElementById('userPersonal').value);
+            const estado = document.getElementById('userEstado').value;
+            
+            let users = getUsers();
+            
+            // Check duplicate username
+            const duplicate = users.find(u => u.username === username && u.id !== parseInt(id));
+            if (duplicate) {
+                showToast('El nombre de usuario ya existe', 'error');
+                return;
+            }
+            
+            if (id) {
+                const index = users.findIndex(u => u.id === parseInt(id));
+                if (index !== -1) {
+                    users[index] = { ...users[index], username, password, rol, personal_id, estado };
+                    showToast('Usuario actualizado correctamente');
+                }
+            } else {
+                const newId = Math.max(...users.map(u => u.id), 0) + 1;
+                users.push({ id: newId, username, password, rol, personal_id, estado: estado || 'a' });
+                showToast('Usuario agregado correctamente');
+            }
+            
+            setData(STORAGE_KEYS.USERS, users);
+            closeModal('userModal');
+            resetUserForm();
+            loadUsersTable();
+        }
+
+        function deleteUser(id) {
+            const user = getUserById(id);
+            if (!user) return;
+            
+            if (user.id === currentUser.id) {
+                showToast('No puede eliminar su propio usuario', 'error');
+                return;
+            }
+            
+            confirmDelete(`¿Desea al usuario "${user.username}"?`, () => {
+                let users = getUsers();
+                users = users.filter(u => u.id !== id);
+                setData(STORAGE_KEYS.USERS, users);
+                showToast('Usuario eliminado correctamente');
+                loadUsersTable();
+            });
+        }
+
+        function resetUserForm() {
+            document.getElementById('userForm').reset();
+            document.getElementById('userId').value = '';
+            document.getElementById('userModalTitle').textContent = 'Agregar Usuario';
+        }
+
+        function populatePersonalSelect(selectId) {
+            const select = document.getElementById(selectId);
+            const currentValue = select.value;
+            select.innerHTML = '<option value="">Seleccione...</option>';
+            
+            getActivePersonal().forEach(p => {
+                const gremio = getGremioById(p.gremio_id);
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.textContent = `${p.nombre} (${gremio?.nombre || 'Sin gremio'})`;
+                select.appendChild(opt);
+            });
+            
+            if (currentValue) select.value = currentValue;
+        }
+
+        // ============================================
+        // ATTENDANCE REGISTRATION
+        // ============================================
+
+        let currentTurno = 'manana';
+        let selectedEmployee = null;
+
+        function switchTurnoTab(btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentTurno = btn.dataset.turno;
+            selectedEmployee = null;
+            document.getElementById('employeeResult').classList.remove('visible');
+            document.getElementById('employeeSearchInput').value = '';
+            document.getElementById('btnSalida').disabled = true;
+            loadTodayAttendance();
+        }
+
+        function searchEmployee(query) {
+            const dropdown = document.getElementById('employeeDropdown');
+            
+            if (query.length < 2) {
+                dropdown.classList.remove('show');
+                dropdown.innerHTML = '';
+                return;
+            }
+            
+            const personal = getActivePersonal().filter(p => 
+                p.cedula.toLowerCase().includes(query.toLowerCase()) ||
+                p.nombre.toLowerCase().includes(query.toLowerCase())
+            );
+            
+            if (personal.length === 0) {
+                dropdown.classList.remove('show');
+                return;
+            }
+            
+            dropdown.innerHTML = personal.slice(0, 8).map(p => {
+                const gremio = getGremioById(p.gremio_id);
+                return `<div class="dropdown-item" onclick="selectEmployee(${p.id})">
+                    <strong>${p.nombre}</strong>
+                    <small>${p.cedula} - ${gremio?.cargo || ''}</small>
+                </div>`;
+            }).join('');
+            
+            dropdown.classList.add('show');
+        }
+
+        function selectEmployee(id) {
+            selectedEmployee = getPersonalById(id);
+            if (!selectedEmployee) return;
+            
+            const gremio = getGremioById(selectedEmployee.gremio_id);
+            
+            document.getElementById('resultName').textContent = selectedEmployee.nombre;
+            document.getElementById('resultCedula').textContent = selectedEmployee.cedula;
+            document.getElementById('resultGremio').textContent = gremio?.nombre || 'N/A';
+            document.getElementById('resultCargo').textContent = gremio?.cargo || 'N/A';
+            
+            document.getElementById('employeeResult').classList.add('visible');
+            document.getElementById('employeeDropdown').classList.remove('show');
+            document.getElementById('employeeSearchInput').value = `${selectedEmployee.cedula} ${selectedEmployee.nombre}`;
+            
+            checkTodayRecord();
+        }
+
+        function checkTodayRecord() {
+            if (!selectedEmployee) return;
+            
+            const today = formatDateForStorage(new Date());
+            const key = currentTurno === 'manana' ? STORAGE_KEYS.ASISTENCIAS_MANANA : STORAGE_KEYS.ASISTENCIAS_TARDE;
+            const records = getData(key);
+            
+            const record = records.find(r => r.personal_id === selectedEmployee.id && r.fecha === today);
+            
+            const btnEntrada = document.getElementById('btnEntrada');
+            const btnSalida = document.getElementById('btnSalida');
+            
+            if (record) {
+                if (record.tm_hor_sal || record.tt_hor_sal) {
+                    // Already completed both
+                    btnEntrada.disabled = true;
+                    btnSalida.disabled = true;
+                    showToast('Ya se ha registrado entrada y salida para este turno hoy', 'info');
+                } else {
+                    // Only entry registered
+                    btnEntrada.disabled = true;
+                    btnSalida.disabled = false;
+                }
+            } else {
+                btnEntrada.disabled = false;
+                btnSalida.disabled = true;
+            }
+        }
+
+        function registrarAsistencia(tipo) {
+            if (!selectedEmployee) {
+                showToast('Debe seleccionar un empleado primero', 'warning');
+                return;
+            }
+            
+            if (selectedEmployee.estado !== 'a') {
+                showToast('El empleado seleccionado está inactivo', 'error');
+                return;
+            }
+            
+            const today = formatDateForStorage(new Date());
+            const now = getCurrentDateTime();
+            const key = currentTurno === 'manana' ? STORAGE_KEYS.ASISTENCIAS_MANANA : STORAGE_KEYS.ASISTENCIAS_TARDE;
+            let records = getData(key);
+            
+            const existingIndex = records.findIndex(r => r.personal_id === selectedEmployee.id && r.fecha === today);
+            
+            if (tipo === 'entrada') {
+                if (existingIndex !== -1) {
+                    showToast('Ya existe un registro de entrada para este turno hoy', 'warning');
+                    return;
+                }
+                
+                const newRecord = {
+                    id: Date.now(),
+                    personal_id: selectedEmployee.id,
+                    fecha: today,
+                    ...(currentTurno === 'manana' ? { tm_hor_lleg: now } : { tt_hor_lleg: now }),
+                    ...(currentTurno === 'manana' ? { tm_hor_sal: null } : { tt_hor_sal: null }),
+                    ...(currentTurno === 'manana' ? { hor_tra_tm: null } : { hor_tra_tt: null }),
+                    estado: 'a'
+                };
+                
+                records.push(newRecord);
+                setData(key, records);
+                showToast(`Entrada registrada: ${now}`);
+                
+                document.getElementById('btnEntrada').disabled = true;
+                document.getElementById('btnSalida').disabled = false;
+                
+            } else {
+                if (existingIndex === -1) {
+                    showToast('Debe registrar la entrada primero', 'error');
+                    return;
+                }
+                
+                const record = records[existingIndex];
+                
+                if (currentTurno === 'manana') {
+                    if (record.tm_hor_sal) {
+                        showToast('Ya se ha registrado la salida de este turno', 'warning');
+                        return;
+                    }
+                    record.tm_hor_sal = now;
+                    record.hor_tra_tm = calculateHoursDiff(record.tm_hor_lleg, now);
+                } else {
+                    if (record.tt_hor_sal) {
+                        showToast('Ya se ha registrado la salida de este turno', 'warning');
+                        return;
+                    }
+                    record.tt_hor_sal = now;
+                    record.hor_tra_tt = calculateHoursDiff(record.tt_hor_lleg, now);
+                }
+                
+                records[existingIndex] = record;
+                setData(key, records);
+                showToast(`Salida registrada: ${now}. Horas trabajadas: ${record.hor_tra_tm || record.hor_tra_tt || '-'}`);
+                
+                document.getElementById('btnSalida').disabled = true;
+            }
+            
+            loadTodayAttendance();
+        }
+
+        function loadTodayAttendance() {
+            const today = formatDateForStorage(new Date());
+            const key = currentTurno === 'manana' ? STORAGE_KEYS.ASISTENCIAS_MANANA : STORAGE_KEYS.ASISTENCIAS_TARDE;
+            const records = getData(key).filter(r => r.fecha === today);
+            
+            const tbody = document.getElementById('todayAttendanceTable');
+            
+            if (records.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="color:var(--text-secondary);padding:32px;">No hay registros para hoy en el turno ${currentTurno === 'manana' ? 'mañana' : 'tarde'}</td></tr>`;
+                return;
+            }
+            
+            tbody.innerHTML = records.map(r => {
+                const personal = getPersonalById(r.personal_id);
+                const entrada = currentTurno === 'manana' ? r.tm_hor_lleg : r.tt_hor_lleg;
+                const salida = currentTurno === 'manana' ? r.tm_hor_sal : r.tt_hor_sal;
+                const horas = currentTurno === 'manana' ? r.hor_tra_tm : r.hor_tra_tt;
+                
+                return `<tr>
+                    <td><strong>${personal?.nombre || 'N/A'}</strong></td>
+                    <td>${personal?.cedula || '-'}</td>
+                    <td>${entrada || '-'}</td>
+                    <td>${salida || '-'}</td>
+                    <td>${horas || '—'}</td>
+                    <td><span class="badge ${salida ? 'badge-success' : 'badge-warning'}">${salida ? 'Completo' : 'Pendiente'}</span></td>
+                </tr>`;
+            }).join('');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-box')) {
+                document.getElementById('employeeDropdown').classList.remove('show');
+            }
+        });
+
+        // ============================================
+        // CONSULTATION
+        // ============================================
+
+        function loadConsultaFilters() {
+            const today = formatDateForStorage(new Date());
+            const weekAgo = new Date();
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            
+            document.getElementById('fechaDesde').value = formatDateForStorage(weekAgo);
+            document.getElementById('fechaHasta').value = today;
+            
+            // Populate employee filter
+            const empSelect = document.getElementById('filtroEmpleadoConsulta');
+            if (empSelect.options.length <= 1) {
+                getActivePersonal().forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.id;
+                    opt.textContent = p.nombre;
+                    empSelect.appendChild(opt);
+                });
+            }
+        }
+
+        function consultarAsistencias() {
+            const fechaDesde = document.getElementById('fechaDesde').value;
+            const fechaHasta = document.getElementById('fechaHasta').value;
+            const filtroGremio = document.getElementById('filtroGremioConsulta').value;
+            const filtroEmpleado = document.getElementById('filtroEmpleadoConsulta').value;
+            
+            if (!fechaDesde || !fechaHasta) {
+                showToast('Seleccione un rango de fechas', 'warning');
+                return;
+            }
+            
+            const mananaRecords = getAsistenciasManana();
+            const tardeRecords = getAsistenciasTarde();
+            
+            // Get all unique dates and employees in range
+            const datesInRange = getDatesInRange(fechaDesde, fechaHasta);
+            let personalList = filtroEmpleado ? [getPersonalById(parseInt(filtroEmpleado))] : getActivePersonal();
+            
+            if (filtroGremio) {
+                personalList = personalList.filter(p => {
+                    const gremio = getGremioById(p.gremio_id);
+                    return gremio?.nombre === filtroGremio;
+                });
+            }
+            
+            const tbody = document.getElementById('consultaTableBody');
+            let rows = [];
+            
+            datesInRange.forEach(fecha => {
+                personalList.forEach(persona => {
+                    const mananaRec = mananaRecords.find(r => r.personal_id === persona.id && r.fecha === fecha);
+                    const tardeRec = tardeRecords.find(r => r.personal_id === persona.id && r.fecha === fecha);
+                    
+                    // Only show rows where there's at least one record or it's the filtered employee
+                    if (mananaRec || tardeRec || filtroEmpleado) {
+                        const totalHoras = ((parseFloat(mananaRec?.hor_tra_tm) || 0) + (parseFloat(tardeRec?.hor_tra_tt) || 0)).toFixed(2);
+                        
+                        let estadoBadge = 'badge-danger';
+                        let estadoText = 'Inasistente';
+                        
+                        if (mananaRec?.tm_hor_sal && tardeRec?.tt_hor_sal) {
+                            estadoBadge = 'badge-success';
+                            estadoText = 'Completo';
+                        } else if (mananaRec || tardeRec) {
+                            estadoBadge = 'badge-warning';
+                            estadoText = 'Parcial';
+                        }
+                        
+                        const gremio = getGremioById(persona.gremio_id);
+                        
+                        rows.push(`<tr>
+                            <td>${formatShortDate(fecha)}</td>
+                            <td>${persona.nombre}</td>
+                            <td><span class="badge badge-primary">${gremio?.nombre || 'N/A'}</span></td>
+                            <td>${mananaRec?.tm_hor_lleg || '-'}</td>
+                            <td>${mananaRec?.tm_hor_sal || '-'}</td>
+                            <td>${mananaRec?.hor_tra_tm || '—'}</td>
+                            <td>${tardeRec?.tt_hor_lleg || '-'}</td>
+                            <td>${tardeRec?.tt_hor_sal || '-'}</td>
+                            <td>${tardeRec?.hor_tra_tt || '—'}</td>
+                            <td><strong>${totalHoras != '0.00' ? totalHoras : '—'}</strong></td>
+                            <td><span class="badge ${estadoBadge}">${estadoText}</span></td>
+                        </tr>`);
+                    }
+                });
+            });
+            
+            if (rows.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="11"><div class="empty-state"><i data-feather="calendar"></i><h3>Sin resultados</h3><p>No hay registros para el período seleccionado.</p></div></td></tr>`;
+            } else {
+                tbody.innerHTML = rows.join('');
+            }
+            
+            feather.replace({ 'stroke-width': 2 });
+        }
+
+        function getDatesInRange(start, end) {
+            const dates = [];
+            const startDate = new Date(start);
+            const endDate = new Date(end);
+            
+            while (startDate <= endDate) {
+                dates.push(formatDateForStorage(new Date(startDate)));
+                startDate.setDate(startDate.getDate() + 1);
+            }
+            
+            return dates;
+        }
+
+        function exportarCSV() {
+            const table = document.getElementById('consultaTableBody');
+            if (!table.rows.length || table.querySelector('.empty-state')) {
+                showToast('No hay datos para exportar', 'warning');
+                return;
+            }
+            
+            let csv = 'Fecha,Empleado,Gremio,Ent.Mañana,Sal.Mañana,Hrs.Mañana,Ent.Tarde,Sal.Tarde,Hrs.Tarde,Total Horas,Estado\n';
+            
+            Array.from(table.rows).forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const rowData = Array.from(cells).map(cell => {
+                    let text = cell.textContent.trim().replace(/,/g, ';');
+                    // Remove badge content, keep just text
+                    text = text.replace(/\s*(Completo|Parcial|Inasistente|Docente|Obrero|Administrativo)\s*/g, '').trim();
+                    return `"${text}"`;
+                });
+                csv += rowData.join(',') + '\n';
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `asistencias_${formatDateForStorage(new Date())}.csv`;
+            link.click();
+            
+            showToast('Archivo CSV descargado');
+        }
+
+        // ============================================
+        // REPORTS
+        // ============================================
+
+        function loadReportDates() {
+            const today = formatDateForStorage(new Date());
+            const monthAgo = new Date();
+            monthAgo.setMonth(monthAgo.getMonth() - 1);
+            
+            document.getElementById('repFechaDesde').value = formatDateForStorage(monthAgo);
+            document.getElementById('repFechaHasta').value = today;
+        }
+
+        function generarReportes() {
+            const fechaDesde = document.getElementById('repFechaDesde').value;
+            const fechaHasta = document.getElementById('repFechaHasta').value;
+            
+            if (!fechaDesde || !fechaHasta) {
+                showToast('Seleccione un rango de fechas', 'warning');
+                return;
+            }
+            
+            const mananaRecords = getAsistenciasManana().filter(r => r.fecha >= fechaDesde && r.fecha <= fechaHasta);
+            const tardeRecords = getAsistenciasTarde().filter(r => r.fecha >= fechaDesde && r.fecha <= fechaHasta);
+            const personal = getActivePersonal();
+            const datesInRange = getDatesInRange(fechaDesde, fechaHasta).length;
+            
+            // Stats by gremio
+            const gremioStats = {};
+            const employeeHours = {};
+            const employeeAbsences = {};
+            
+            personal.forEach(p => {
+                const gremio = getGremioById(p.gremio_id);
+                const gremioName = gremio?.nombre || 'Sin gremio';
+                
+                if (!gremioStats[gremioName]) {
+                    gremioStats[gremioName] = { totalAsistencias: 0, totalHoras: 0, count: 0 };
+                }
+                gremioStats[gremioName].count++;
+                
+                employeeHours[p.id] = { name: p.nombre, hours: 0 };
+                employeeAbsences[p.id] = { name: p.nombre, absences: 0 };
+            });
+            
+            mananaRecords.forEach(r => {
+                const p = getPersonalById(r.personal_id);
+                if (!p) return;
+                const gremio = getGremioById(p.gremio_id);
+                const gremioName = gremio?.nombre || 'Sin gremio';
+                
+                if (gremioStats[gremioName]) {
+                    gremioStats[gremioName].totalAsistencias++;
+                    if (r.hor_tra_tm) gremioStats[gremioName].totalHoras += parseFloat(r.hor_tra_tm);
+                }
+                
+                if (employeeHours[r.personal_id]) {
+                    if (r.hor_tra_tm) employeeHours[r.personal_id].hours += parseFloat(r.hor_tra_tm);
+                }
+            });
+            
+            tardeRecords.forEach(r => {
+                const p = getPersonalById(r.personal_id);
+                if (!p) return;
+                const gremio = getGremioById(p.gremio_id);
+                const gremioName = gremio?.nombre || 'Sin gremio';
+                
+                if (gremioStats[gremioName]) {
+                    gremioStats[gremioName].totalAsistencias++;
+                    if (r.hor_tra_tt) gremioStats[gremioName].totalHoras += parseFloat(r.hor_tra_tt);
+                }
+                
+                if (employeeHours[r.personal_id]) {
+                    if (r.hor_tra_tt) employeeHours[r.personal_id].hours += parseFloat(r.hor_tra_tt);
+                }
+            });
+            
+            // Calculate expected attendances per employee
+            Object.keys(employeeAbsences).forEach(pid => {
+                const p = getPersonalById(parseInt(pid));
+                if (!p) return;
+                const empManana = mananaRecords.filter(r => r.personal_id === parseInt(pid)).length;
+                const empTarde = tardeRecords.filter(r => r.personal_id === parseInt(pid)).length;
+                employeeAbsences[parseInt(pid)].absences = Math.max(0, (datesInRange * 2) - empManana - empTarde);
+            });
+            
+            // Render stats grid
+            const statsHtml = Object.entries(gremioStats).map(([name, stats]) => `
+                <div class="report-stat">
+                    <div class="report-stat-value">${stats.totalAsistencias}</div>
+                    <div class="report-stat-label">Asistencias - ${name}</div>
+                    <div style="font-size:13px;color:var(--text-secondary);margin-top:8px;">
+                        Promedio: ${(stats.totalHoras / stats.count || 0).toFixed(1)} hrs/empleado
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('reportStatsGrid').innerHTML = statsHtml || '<div class="report-stat"><div class="report-stat-label">Sin datos</div></div>';
+            
+            // Top employees by hours
+            const sortedByHours = Object.values(employeeHours).sort((a, b) => b.hours - a.hours).slice(0, 5);
+            document.getElementById('topEmployeesTable').innerHTML = sortedByHours.map((emp, i) => `
+                <tr>
+                    <td>${i + 1}</td>
+                    <td>${emp.name}</td>
+                    <td><strong>${emp.hours.toFixed(2)}</strong> horas</td>
+                </tr>
+            `).join('<tr><td colspan="3" style="color:var(--text-secondary)">Sin datos suficientes</td></tr>') || '';
+            
+            // Most absent employees
+            const sortedByAbsences = Object.values(employeeAbsences).sort((a, b) => b.absences - a.absences).slice(0, 5).filter(e => e.absences > 0);
+            document.getElementById('absentEmployeesTable').innerHTML = sortedByAbsences.length > 0 ? sortedByAbsences.map((emp, i) => `
+                <tr>
+                    <td>${i + 1}</td>
+                    <td>${emp.name}</td>
+                    <td><span class="badge badge-danger">${emp.absences} inasistencia(s)</span></td>
+                </tr>
+            `).join('') : '<tr><td colspan="3" style="color:var(--text-secondary);padding:24px;text-align:center;">Excelente! No hay inasistencias significativas</td></tr>';
+        }
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeStorage();
+            feather.replace({ 'stroke-width': 2 });
+            
+            // Setup modal triggers for "Add" buttons
+            document.querySelectorAll('[onclick*="openModal"]').forEach(btn => {
+                const modalId = btn.getAttribute('onclick').match(/'(\w+)'/)?.[1];
+                if (modalId) {
+                    btn.addEventListener('click', () => {
+                        if (modalId === 'personalModal') {
+                            resetPersonalForm();
+                            populateGremioSelect('personalGremio');
+                        } else if (modalId === 'gremioModal') {
+                            resetGremioForm();
+                        } else if (modalId === 'userModal') {
+                            resetUserForm();
+                            populatePersonalSelect('userPersonal');
+                        }
+                    });
+                }
+            });
+            
+            // Check if already logged in (optional session persistence could be added here)
+            updateCurrentDate();
+        });
+    </script>
+</body>
+</html>
