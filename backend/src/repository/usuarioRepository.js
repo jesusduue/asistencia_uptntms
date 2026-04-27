@@ -1,4 +1,4 @@
-import { pool } from '../config/conexion.js';
+import pool from '../config/conexion.js';
 /* repositorio para manejar unicamente las consultas SQL
  */
 
